@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            background-color: #1b1b1b;
+            margin-top: 10%;
+        }
+        #table {
+            margin: auto;
+            width: 25%
+        }
+        .col {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 120px;
+        }
+        .vertical {
+            border-left: 6px solid #A9A9A9FF;
+            height:120px;
+        }
+        button {
+            width:8%;
+            height: 30px;
+            background-color: #A9A9A9FF;
+        }
+        button:hover {
+            background-color: #5F9EA0FF;
+            text-decoration-line: underline;
+            text-decoration-thickness: 2px;
+        }
+        .buttons {
+            display: flex;
+            margin: 60px;
+            justify-content: space-evenly;
+        }
+        hr {
+            border: 3px solid #A9A9A9FF;
+        }
+    </style>
+</head>
+<body>
+<div id="table">
+    <script>
+      let table = document.getElementById("table");
+      for (let y = 1; y <= 3; y++) {
+        let row = document.createElement("div");
+        row.setAttribute("style", "display:flex")
+        for (let x = 1; x <= 3; x++) {
+          let col = document.createElement("div");
+          col.setAttribute("class", "col");
+          col.setAttribute("index", y + "." + x);
+          // col.innerHTML = y + "." + x;
+          row.appendChild(col);
+          if (x !== 3) {
+            let vertical = document.createElement("div");
+            vertical.setAttribute("class", "vertical");
+            row.appendChild(vertical);
+          } else if (y !== 1) {
+            let hr = document.createElement("hr");
+            table.appendChild(hr);
+          }
+        }
+        table.appendChild(row);
+      }
+    </script>
+</div>
+<div class="buttons">
+    <button id="x">X</button>
+    <button id="o">O</button>
+</div>
+</body>
+</html>
