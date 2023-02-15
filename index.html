@@ -2,81 +2,223 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Tictactoe_p2</title>
     <style>
         body {
-            background-color: #1b1b1b;
+            background-color: #504b4b;
             margin-top: 10%;
             height: 100%;
-        }
-        #table {
-            margin: auto;
-            width: 25%;
-            height: 25%;
-        }
-        .col {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-size: 200%;
         }
         .row {
             display: flex;
-            height: 15vh;
+            flex-wrap: nowrap;
+            justify-content: space-evenly;
+            flex-direction: row-reverse;
         }
-        .vertical {
-            border-left: 6px solid #A9A9A9FF;
-            height:100%;
+        aside {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #grid {
+            margin-left:auto;
+            margin-right:auto;
+            width: 300px;
+            height: 300px;
+        }
+        td, th {
+            margin: auto;
+            padding: 15px;
+            border-width: thick;
+            height: 50px;
+            vertical-align:top;
+        }
+        .cell {
+            display: inline-block;
+            text-align: center;
+            line-height: 90px;
+            height: 90px;
+            width: 96px;
+            border-width: 5px;
+            vertical-align:top;
         }
         button {
-            width: 150px;
-            height: 30px;
             background-color: #A9A9A9FF;
+            border-radius: 6px;
+
+        }
+        .disabled {
+            pointer-events: none;
+            opacity: 0.4;
+            cursor: not-allowed;
         }
         button:hover {
             background-color: #5F9EA0FF;
             text-decoration-line: underline;
             text-decoration-thickness: 2px;
         }
-        .buttons {
+        .menu {
             display: flex;
-            margin: 60px;
-            justify-content: space-evenly;
+            justify-content: space-between;
+            margin-top: 50px;
         }
-        hr {
-            border: 3px solid #A9A9A9FF;
-        }
+
     </style>
 </head>
 <body>
-<div id="table">
-    <script>
-      let table = document.getElementById("table");
-      for (let y = 1; y <= 3; y++) {
-        let row = document.createElement("div");
-        row.setAttribute("class", "row")
-        for (let x = 1; x <= 3; x++) {
-          let col = document.createElement("div");
-          col.setAttribute("class", "col");
-          col.setAttribute("index", y + "." + x);
-          // col.innerHTML = y + "." + x;
-          row.appendChild(col);
-          if (x !== 3) {
-            let vertical = document.createElement("div");
-            vertical.setAttribute("class", "vertical");
-            row.appendChild(vertical);
-          } else if (y !== 1) {
-            let hr = document.createElement("hr");
-            table.appendChild(hr);
-          }
-        }
-        table.appendChild(row);
-      }
-    </script>
-</div>
-<div class="buttons">
-    <button id="x">X</button>
-    <button id="o">O</button>
+<div id="message" style="height: 50px; text-align: center; margin-bottom: 50px; opacity: 0.6;"></div>
+<div class="row">
+    <div class="left">
+        <div>
+            <aside>
+                <h3 style="color: #FFFFFFFF; font-family: cursive; margin-top: 0px">Score:</h3>
+                <table id="score" style="color: #FFFFFFFF">
+                    <tr>
+                        <th style="border-style: none solid none none">&#10060</th>
+                        <th>&#11093</th>
+                    </tr>
+                    <tr>
+                        <td id="X" style="border-style: none solid none none"></td>
+                        <td id="O"></td>
+                    </tr>
+                </table>
+            </aside>
+        </div>
+    </div>
+    <div class="right">
+        <div id="grid">
+            <script>
+              // template
+              let grid = document.getElementById("grid");
+              for (let i = 1; i < 10; i++) {
+                let div = document.createElement("div");
+                div.setAttribute("class", "cell");
+                div.setAttribute("position", i);
+                if (i < 3) {
+                  div.style.borderStyle = "none solid none none";
+                } else if (i === 6 || i === 9) {
+                  div.style.borderStyle = "solid none none none";
+                } else if (i === 3) {
+                  div.style.borderStyle = "none none none none";
+                } else {
+                  div.style.borderStyle = "solid solid none none";
+                }
+                grid.appendChild(div);
+              }
+            </script>
+            <script>
+              // logic
+              window.addEventListener('load', function () {
+                let buttons = document.getElementById("buttons");
+                let flag = 0; // 1 - win, 2 - draw
+                let grid = document.getElementById("grid");
+                let message = document.getElementById("message");
+                let reset = document.getElementById("reset");
+                let turn = null;
+                let player = '';
+
+                const data = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+                function switchTurn() {
+                  return(turn == "X" ? turn = "O" : turn = "X");
+                }
+
+                function winCondition (data) {
+                  for (let i = 0; i < 3; i++) {
+                    if (data[i*3] === data[i*3+1] && data[i*3] === data[i*3+2] // check rows
+                      || data[i] === data[i+3] && data[i] === data[i+6]  // check columns
+                      || data[0] === data[4] && data[0] === data[8] // check diagonals
+                      || data[2] === data[4] && data[2] === data[6])
+                    {
+                      flag = 1;
+                      if (localStorage.score) {
+                        localStorage.score = Number(localStorage.score) + 1;
+                      }
+                    }
+                  }
+                  if (data.every(function(element) {return typeof element === 'string';})) {
+                    flag = 2;
+                  }
+                }
+                // choose  x or o to start
+                buttons.addEventListener("click", (event) => {
+                  if (event.target.tagName === 'BUTTON') {
+                    turn = event.target.id;
+                    buttons.setAttribute("class", "disabled");
+                  }
+                });
+
+                // reset button
+                reset.addEventListener("click", (ev) => {
+                  if (ev.target.tagName === 'BUTTON') {
+                    document.querySelectorAll('.cell').forEach(resetCell);
+                    message.innerHTML = '';
+                    message.style.backgroundColor = '';
+                    buttons.setAttribute("class", "buttons");
+                    grid.addEventListener("click", mouseClick);
+                    flag = 0;
+                    turn = null;
+                  }
+                })
+
+                function resetCell (item, index) {
+                  item.innerHTML = '';
+                  data[index] = index;
+                }
+
+                function setScore (turn) {
+                  let score = document.getElementById(turn);
+                  score.innerHTML = Number(score.innerHTML) + 1;
+                }
+
+                // handler function for mouse click
+                const mouseClick = (e) => {
+                  if (!e.target.innerHTML) {
+                    if (turn) {
+                      if (turn == "X") {
+                        e.target.innerHTML = "&#10060";
+                        data[e.target.attributes.position.value -1] = 'X';
+                        winCondition(data);
+                      }
+                      if (turn == "O") {
+                        e.target.innerHTML = "&#11093";
+                        data[e.target.attributes.position.value -1] = 'O';
+                        winCondition(data);
+                      }
+                      if (flag === 1) {
+                        turn === "X" ? player = "&#10060" : player = "&#11093";
+                        message.innerHTML = player + '  - WINNER!!!';
+                        message.style.backgroundColor = 'green';
+                        setScore(turn);
+                        grid.removeEventListener("click", mouseClick);
+                        return
+                      }
+                      if (flag === 2) {
+                        message.innerHTML = 'DRAW';
+                        message.style.backgroundColor = 'yellow';
+                        grid.removeEventListener("click", mouseClick);
+                        return
+                      }
+                      turn = switchTurn();
+                    } else {
+                      alert('Choose your play');
+                    }
+                  }
+                }
+
+                grid.addEventListener("click", mouseClick);
+              })
+            </script>
+        </div>
+        <div class="menu">
+            <div class="buttons" id="buttons">
+                <button id="X" style="font-size: 20px">&#10060</button>
+                <button id="O" style="font-size: 20px">&#11093</button>
+            </div>
+            <button id="reset" style="margin: 3px; color: #FF0000FF">RESTART</button>
+        </div>
+    </div>
 </div>
 </body>
 </html>
